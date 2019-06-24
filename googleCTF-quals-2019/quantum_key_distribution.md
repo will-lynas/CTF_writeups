@@ -10,8 +10,6 @@
 
 See [here](https://qt.eu/understand/underlying-principles/quantum-key-distribution-qkd/) for a full explanation of how **Quantum Key Distribution** works.
 
-All we have to do is 
-
 First we need to generate the qubits and basis. To make things simpler, we set each qubit to `0+1j` and each basis to `"+"`. This means that every qubit, when measured, will result in a `1`. There are actually three other combinations of qubits and basis which result in a known bit, but this is the only one which does not get rejected and produce an error from the server about our data not being random enough.
 ```
 basis = ["+" for i in range(512)]
