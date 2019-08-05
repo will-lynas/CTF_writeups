@@ -183,17 +183,17 @@ def scan(param):
 		return "Connection Timeout" 
 ```
 
-To read local files we could use the `"file://"` protocol, however any `param` value that starts with `"file"` or `"gopher"` is blocked in the `challenge()` function. I believe there are multiple ways to get past this, but I noticed that starting `param` with a `"/"` would attempt to read files from the root of the file system. The challenge hint says...
+To read local files we could use the `"file://"` protocol, however any `param` value that starts with `"file"` or `"gopher"` is blocked in the `challenge()` function. I believe there are multiple ways to get past this, but I noticed that starting `param` without a protocol would attempt to read files from the file system. The challenge hint says...
 
 >flag is in ./flag.txt
 
-...however we do not know the current working directory (CWD) and therefore where `"."` is. We can use a trick to get past this. `"/proc/self/cwd"` is a symlink to the process' CWD. We can read the flag with `"/proc/self/cwd/flag.txt"`.
-
 This will allow us to read the flag into a file, but we will not be able to read it without a valid sign with the action **including** `"read"`. If we can generate a sign for the `action` as `"readscan"`, we can perform the scan and read the result in one go.
 
-Notice, `geneSign()` will perform an md5 hash of `secret + param + action` so we can pass the value of `param` as `"/proc/self/flag.txtread"` (the value of `action` will be `"scan"`) and generate the *same* hash as if we pass `param` as `"/proc/self/flag.txt"` and `action` as `"readscan"`.
+Notice, `geneSign()` will perform an md5 hash of `secret + param + action` so we can pass the value of `param` as `"flag.txtread"` (the value of `action` will be `"scan"`) and generate the *same* hash as if we pass `param` as `"flag.txt"` and `action` as `"readscan"`.
 
-```"/proc/self/flag.txtread"+"scan" == "/proc/self/flag.txt"+"readscan"```
+```"flag.txtread"+"scan" == "flag.txt"+"readscan"```
+
+You could also use a length extension attack, but this way is more simple.
 
 So our exploit is complete.
 
@@ -207,7 +207,7 @@ import requests
 def geneSign(param):
 	return requests.get("http://139.180.128.86/geneSign?param="+param).text
 
-realParam = "/proc/self/cwd/flag.txt"
+realParam = "flag.txt"
 
 param = realParam+"read"
 sign = geneSign(param)
